@@ -1,4 +1,4 @@
 (:project com.g414.codec/g414-codec
   (:types jar)
-  (:deps test    org.testng/testng/jdk15@5.11))
+  (:deps test    org.testng/testng@5.11#jdk15))
 
