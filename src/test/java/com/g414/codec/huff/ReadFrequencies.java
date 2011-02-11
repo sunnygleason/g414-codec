@@ -8,16 +8,41 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ReadFrequencies {
-	public static int[] readFreq(InputStream input) {
-		int[] freq = new int[256];
+	public static long[] readFreqFile(InputStream input) {
+		long[] freq = new long[256];
+		Scanner scanner = null;
+		long total = 0;
+		try {
+			scanner = new Scanner(input);
+			while (scanner.hasNextLine()) {
+				String[] line = scanner.nextLine().split("\\s+");
+				long f = Long.parseLong(line[0]);
+				int c = Integer.parseInt(line[1]);
+				if (c > 128) {
+					continue;
+				}
+
+				total += f;
+				freq[Character.toUpperCase(c)] += f;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("===> TOTAL: " + total + " bytes");
+
+		return freq;
+	}
+
+	public static long[] readFreq(InputStream input) {
+		long[] freq = new long[256];
 		Scanner scanner = null;
 		int total = 0;
 		try {
 			scanner = new Scanner(input);
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
-				char[] data = line.substring(0, line.lastIndexOf('|'))
-						.toCharArray();
+				char[] data = line.toCharArray();
 				total += data.length;
 				for (int i = 0; i < data.length; i++) {
 					freq[data[i]] += 1;
@@ -32,7 +57,7 @@ public class ReadFrequencies {
 		return freq;
 	}
 
-	public static List<CharFreq> sortFreq(int[] freq) {
+	public static List<CharFreq> sortFreq(long[] freq) {
 		List<CharFreq> output = new ArrayList<CharFreq>();
 
 		for (int i = 0; i < freq.length; i++) {
@@ -74,10 +99,10 @@ public class ReadFrequencies {
 	public static void showTree(CharFreq input, String indent, String marker,
 			List<String> collector) {
 		if (input.b != 0) {
-			System.out.println(indent
+			System.out.println((indent
 					+ ((input.b == 0) ? "~" : "'" + input.b + "'") + " : "
-					+ input.f + "    [" + marker + "]");
-			collector.add(marker + "\t'" + input.b + "'\t"
+					+ input.f + "    [" + marker + "]").replaceAll("\\s", " "));
+			collector.add(marker + "|'" + input.b + "'|"
 					+ ((input.f * marker.length()) / 8));
 		}
 
@@ -118,7 +143,7 @@ public class ReadFrequencies {
 
 	public static class CharFreq {
 		public char b;
-		public int f;
+		public long f;
 		public CharFreq l;
 		public CharFreq r;
 	}
